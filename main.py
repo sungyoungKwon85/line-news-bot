@@ -2,9 +2,26 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import json
+import google.generativeai as genai
 
 LINE_TOKEN = os.environ.get('LINE_TOKEN')
 LINE_USER_ID = os.environ.get('LINE_USER_ID')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+
+def translate_text(text):
+    if not GEMINI_API_KEY:
+        return text
+    try:
+        prompt = f"다음 IT 기술 블로그의 제목을 한국어로 자연스럽게 번역해줘. 부연 설명 없이 번역된 문장만 출력해:\n\n{text}"
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        print(f"번역 에러: {e}")
+        return text
 
 def send_line_message(text):
     url = "https://api.line.me/v2/bot/message/push"
@@ -16,23 +33,41 @@ def send_line_message(text):
         "to": LINE_USER_ID,
         "messages": [{"type": "text", "text": text}]
     }
-    requests.post(url, headers=headers, json=payload)
+    res = requests.post(url, headers=headers, json=payload)
+    
+    if res.status_code != 200:
+        print(f"🚨 라인 전송 실패! 코드: {res.status_code}")
+        print(f"🚨 에러 상세 내용: {res.text}")
+        return False
+    return True
 
-# 백엔드, Java/Spring, 대용량 아키텍처 관련 고품질 기술 블로그 10선
+# 국내 10개 + 해외 10개 총 20개 탑급 기술 블로그 라인업
 FEEDS = {
-    "토스": "https://toss.tech/rss.xml",
-    "우아한형제들(배민)": "https://techblog.woowahan.com/feed/",
-    "라인(LINE)": "https://engineering.linecorp.com/ko/feed/",
-    "당근마켓": "https://medium.com/feed/daangn",
-    "카카오페이": "https://tech.kakaopay.com/rss.xml",
-    "컬리(Kurly)": "https://helloworld.kurly.com/feed",
-    "왓챠(Watcha)": "https://medium.com/feed/watcha",
-    "야놀자": "https://medium.com/feed/yanolja",
-    "쏘카(Socar)": "https://tech.socarcorp.kr/feed",
-    "데브시스터즈": "https://tech.devsisters.com/rss.xml"
+    # --- 국내 10개 ---
+    "토스": {"url": "https://toss.tech/rss.xml", "lang": "ko"},
+    "우아한형제들(배민)": {"url": "https://techblog.woowahan.com/feed/", "lang": "ko"},
+    "카카오 테크": {"url": "https://tech.kakao.com/feed/", "lang": "ko"},
+    "라인(LINE)": {"url": "https://engineering.linecorp.com/ko/feed/", "lang": "ko"},
+    "당근마켓": {"url": "https://medium.com/feed/daangn", "lang": "ko"},
+    "카카오페이": {"url": "https://tech.kakaopay.com/rss.xml", "lang": "ko"},
+    "컬리(Kurly)": {"url": "https://helloworld.kurly.com/feed", "lang": "ko"},
+    "왓챠(Watcha)": {"url": "https://medium.com/feed/watcha", "lang": "ko"},
+    "야놀자": {"url": "https://medium.com/feed/yanolja", "lang": "ko"},
+    "쏘카(Socar)": {"url": "https://tech.socarcorp.kr/feed", "lang": "ko"},
+
+    # --- 해외 10개 ---
+    "Spotify Engineering": {"url": "https://engineering.atspotify.com/feed/", "lang": "en"},
+    "Netflix TechBlog": {"url": "https://netflixtechblog.com/feed", "lang": "en"},
+    "Uber Engineering": {"url": "https://www.uber.com/en-KR/blog/engineering/rss/", "lang": "en"},
+    "Airbnb Engineering": {"url": "https://medium.com/feed/airbnb-engineering", "lang": "en"},
+    "Meta Engineering": {"url": "https://engineering.fb.com/feed/", "lang": "en"},
+    "Cloudflare": {"url": "https://blog.cloudflare.com/rss/", "lang": "en"},
+    "Pinterest Engineering": {"url": "https://medium.com/feed/@Pinterest_Engineering", "lang": "en"},
+    "Slack Engineering": {"url": "https://slack.engineering/feed/", "lang": "en"},
+    "Dropbox Tech": {"url": "https://dropbox.tech/feed", "lang": "en"},
+    "ByteByteGo (System Design)": {"url": "https://blog.bytebytego.com/feed", "lang": "en"}
 }
 
-# 각 블로그별 마지막 글 링크를 기억할 JSON 파일 읽기
 try:
     with open('last_posts.json', 'r', encoding='utf-8') as f:
         last_posts = json.load(f)
@@ -41,38 +76,41 @@ except (FileNotFoundError, json.JSONDecodeError):
 
 new_posts_found = False
 
-for blog_name, rss_url in FEEDS.items():
+for blog_name, info in FEEDS.items():
+    rss_url = info["url"]
+    lang = info["lang"]
     try:
         response = requests.get(rss_url, timeout=10)
         soup = BeautifulSoup(response.content, 'xml')
         
-        # 블로그마다 RSS 표준이 다르므로 item 또는 entry 태그를 찾음
         latest_item = soup.find('item') or soup.find('entry')
-        if not latest_item:
-            continue
+        if not latest_item: continue
         
         title = latest_item.title.text.strip()
         
-        # 링크 추출 방식 예외 처리
         link_tag = latest_item.link
         if link_tag:
             link = link_tag.text.strip() if link_tag.text.strip() else link_tag.get('href', '')
-        else:
-            continue
+        else: continue
             
         last_link = last_posts.get(blog_name, "")
         
-        # 새로운 글이 올라왔다면?
         if link and link != last_link:
-            message = f"📢 {blog_name} 기술 블로그 새 글!\n\n[{title}]\n{link}"
-            send_line_message(message)
-            last_posts[blog_name] = link
-            new_posts_found = True
+            display_title = title
             
+            if lang == "en":
+                translated_title = translate_text(title)
+                display_title = f"{translated_title}\n(원문: {title})"
+            
+            message = f"📢 {blog_name} 기술 블로그 새 글!\n\n[{display_title}]\n{link}"
+            
+            if send_line_message(message):
+                last_posts[blog_name] = link
+                new_posts_found = True
+                
     except Exception as e:
         print(f"{blog_name} 파싱 에러: {e}")
 
-# 변경사항이 있으면 JSON 파일에 덮어쓰기
 if new_posts_found:
     with open('last_posts.json', 'w', encoding='utf-8') as f:
         json.dump(last_posts, f, ensure_ascii=False, indent=2)
