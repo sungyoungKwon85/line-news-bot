@@ -9,7 +9,7 @@ jobs:
   run-bot:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 봇이 last_post.txt 파일을 수정하고 저장소에 다시 푸시할 수 있도록 권한 부여
+      contents: write # 봇이 last_posts.json 파일을 수정하고 저장소에 다시 푸시할 수 있도록 권한 부여
       
     steps:
       - name: 저장소 코드 가져오기
@@ -24,15 +24,15 @@ jobs:
         run: pip install requests beautifulsoup4 lxml
 
       - name: 파이썬 크롤러 실행!
-        env: # 깃허브 시크릿에 등록한 값을 환경변수로 주입
+        env: 
           LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
         run: python main.py
 
-      - name: 업데이트된 기록(last_post.txt) 저장소에 반영(Commit & Push)
+      - name: 업데이트된 기록(last_posts.json) 저장소에 반영
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add last_post.txt
-          git commit -m "Update last_post.txt" || echo "No changes to commit"
+          git add last_posts.json
+          git commit -m "Update last_posts.json" || echo "No changes to commit"
           git push
