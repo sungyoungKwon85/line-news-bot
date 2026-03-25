@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import os
 import json
 import urllib3
-import time # 쿨타임을 주기 위한 모듈 추가
+import time
 from google import genai
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -12,40 +12,45 @@ LINE_TOKEN = os.environ.get('LINE_TOKEN')
 LINE_USER_ID = os.environ.get('LINE_USER_ID')
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
-def summarize_post(title, content, lang):
+def summarize_post(title, content, lang, retries=2):
     if not GEMINI_API_KEY:
         return f"[{title}]"
     
-    # RSS에 본문이 없거나 너무 짧을 경우의 방어 로직
     if len(content) < 50:
         safe_content = "본문이 RSS에 제공되지 않았습니다. 원문 링크를 참고하세요."
     else:
         safe_content = content
 
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        prompt = f"""
-        다음 IT 기술 블로그 글을 읽고 메시지를 작성해.
-        
-        요구사항:
-        1. 제목이 영어라면 한국어로 번역해서 첫 줄에 대괄호 `[]` 안에 적어. (한국어면 원문 그대로)
-        2. 본문 내용을 파악하여 백엔드 관점에서 핵심만 2~3줄로 한글로 요약해. (각 줄은 `-` 로 시작)
-        3. 인사말이나 수식어 없이 딱 제목과 요약만 출력해.
-        
-        [원본 데이터]
-        제목: {title}
-        언어: {lang}
-        본문: {safe_content}
-        """
-        
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt
-        )
-        return response.text.strip()
-    except Exception as e:
-        print(f"요약 에러 ({title}): {e}")
-        return f"[{title}]\n- (API 호출 제한 또는 오류로 요약 불가)"
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    prompt = f"""
+    다음 IT 기술 블로그 글을 읽고 메시지를 작성해.
+    
+    요구사항:
+    1. 제목이 영어라면 한국어로 번역해서 첫 줄에 대괄호 `[]` 안에 적어. (한국어면 원문 그대로)
+    2. 본문 내용을 파악하여 백엔드/아키텍처 관점에서 핵심만 2~3줄로 한글로 요약해. (각 줄은 `-` 로 시작)
+    3. 인사말이나 수식어 없이 딱 제목과 요약만 출력해.
+    
+    [원본 데이터]
+    제목: {title}
+    언어: {lang}
+    본문: {safe_content}
+    """
+    
+    # 에러 시 재시도(Retry) 로직
+    for attempt in range(retries):
+        try:
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt
+            )
+            return response.text.strip()
+        except Exception as e:
+            print(f"요약 에러 ({title}) - 시도 {attempt+1}/{retries}: {e}")
+            if attempt < retries - 1:
+                print("15초 대기 후 재시도합니다...")
+                time.sleep(15) # 제한에 걸렸을 경우 15초간 충분히 휴식
+            else:
+                return f"[{title}]\n- (API 호출 제한으로 요약 불가)"
 
 def send_line_message(text):
     url = "https://api.line.me/v2/bot/message/push"
@@ -123,8 +128,8 @@ for blog_name, info in FEEDS.items():
         last_link = last_posts.get(blog_name, "")
         
         if link and link != last_link:
-            # ⭐ API 제한(Rate Limit)을 피하기 위해 요청 전 4초 대기
-            time.sleep(4)
+            # ⭐ 기본 대기 시간을 6초로 늘려 안정성 확보
+            time.sleep(6)
             
             summary_message = summarize_post(title, text_content, lang)
             final_message = f"{summary_message}\n\n{link}"
