@@ -85,7 +85,7 @@ FEEDS = {
 }
 
 try:
-    with open('last_posts.json', 'r', encoding='utf-8') as f:
+    with open('last_posts_js.json', 'r', encoding='utf-8') as f:
         last_posts = json.load(f)
 except (FileNotFoundError, json.JSONDecodeError):
     last_posts = {}
@@ -132,7 +132,7 @@ for blog_name, info in FEEDS.items():
         print(f"{blog_name} 파싱 에러: {e}")
 
 if new_posts_found:
-    with open('last_posts.json', 'w', encoding='utf-8') as f:
+    with open('last_posts_js.json', 'w', encoding='utf-8') as f:
         json.dump(last_posts, f, ensure_ascii=False, indent=2)
     print("새 글 전송 및 기록 업데이트 완료!")
 else:
