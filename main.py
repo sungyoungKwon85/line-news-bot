@@ -50,7 +50,7 @@ def summarize_post(title, content, lang, retries=2):
                 print("15초 대기 후 재시도합니다...")
                 time.sleep(15) # 제한에 걸렸을 경우 15초간 충분히 휴식
             else:
-                return f"[{title}]\n- (API 호출 제한으로 요약 불가)"
+                return None
 
 def send_line_message(text):
     url = "https://api.line.me/v2/bot/message/push"
@@ -132,6 +132,9 @@ for blog_name, info in FEEDS.items():
             time.sleep(6)
             
             summary_message = summarize_post(title, text_content, lang)
+            if summary_message is None:
+                print(f"⚠️ [{blog_name}] 요약 실패! 라인 전송을 보류하고 내일 다시 시도합니다.")
+                continue
             final_message = f"{summary_message}\n\n{link}"
             
             if send_line_message(final_message):
