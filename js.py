@@ -50,7 +50,7 @@ def summarize_post(title, content, lang, retries=2):
             if attempt < retries - 1:
                 time.sleep(15) 
             else:
-                return f"[{title}]\n- (API 호출 제한으로 요약 불가)"
+                return None
 
 def send_line_message(text):
     url = "https://api.line.me/v2/bot/message/push"
@@ -69,17 +69,29 @@ def send_line_message(text):
         return False
     return True
 
-# 와이프분의 전공(언어학, 인지과학, 제2언어 습득)에 맞춘 글로벌 최상급 소스
+# 와이프분의 전공(SLA, 심리언어학, 인지과학)에 맞춘 글로벌 최상급 소스 14선
 FEEDS = {
-    # --- 국제 학술지 (Open Access) ---
-    "MDPI Languages (국제 언어학 저널)": {"url": "https://www.mdpi.com/rss/journal/languages", "lang": "en"},
+    # --- 1. 국제 학술지 (Open Access) ---
+    "MDPI Languages": {"url": "https://www.mdpi.com/rss/journal/languages", "lang": "en"},
     "Frontiers in Language Sciences": {"url": "https://www.frontiersin.org/journals/psychology/section/language-sciences/rss", "lang": "en"},
-    
-    # --- 최신 연구 및 과학 뉴스 ---
-    "ScienceDaily (언어습득 연구)": {"url": "https://www.sciencedaily.com/rss/mind_brain/language_acquisition.xml", "lang": "en"},
+    "Open Linguistics (De Gruyter)": {"url": "https://www.degruyter.com/rss/journal/opli", "lang": "en"},
+
+    # --- 2. 제2언어 습득(SLA) & 응용언어학 최상위 저널 ---
+    "Language Learning (Wiley)": {"url": "https://onlinelibrary.wiley.com/feed/14679922/most-recent", "lang": "en"},
+    "The Modern Language Journal (Wiley)": {"url": "https://onlinelibrary.wiley.com/feed/15404781/most-recent", "lang": "en"},
+    "Second Language Research (Sage)": {"url": "https://journals.sagepub.com/action/showFeed?jc=slra&type=etoc&feed=rss", "lang": "en"},
+    "Language Teaching Research (Sage)": {"url": "https://journals.sagepub.com/action/showFeed?jc=ltra&type=etoc&feed=rss", "lang": "en"},
+
+    # --- 3. 인지과학 & 심리언어학 저널 ---
+    "Cognitive Science (Wiley)": {"url": "https://onlinelibrary.wiley.com/feed/15516709/most-recent", "lang": "en"},
+    "Journal of Psycholinguistic Research": {"url": "https://link.springer.com/search.rss?facet-journal-id=10936&sortOrder=newestFirst", "lang": "en"},
+
+    # --- 4. 최신 연구 및 과학 뉴스 (매일 업데이트 됨) ---
+    "ScienceDaily (언어습득)": {"url": "https://www.sciencedaily.com/rss/mind_brain/language_acquisition.xml", "lang": "en"},
     "ScienceDaily (인지심리학)": {"url": "https://www.sciencedaily.com/rss/mind_brain/cognitive_psychology.xml", "lang": "en"},
-    
-    # --- 저명한 언어학 블로그 ---
+    "EurekAlert! (사회/행동과학)": {"url": "https://www.eurekalert.org/rss/social_behavioral.xml", "lang": "en"},
+
+    # --- 5. 저명한 언어학 블로그 ---
     "Language Log (펜실베니아대)": {"url": "https://languagelog.ldc.upenn.edu/nll/?feed=rss2", "lang": "en"},
     "All Things Linguistic": {"url": "https://allthingslinguistic.com/rss", "lang": "en"}
 }
@@ -120,6 +132,9 @@ for blog_name, info in FEEDS.items():
             time.sleep(6) # 구글 API 제한 방지
             
             summary_message = summarize_post(title, text_content, lang)
+            if summary_message is None:
+                print(f"⚠️ [{blog_name}] 요약 실패! 라인 전송을 보류하고 내일 다시 시도합니다.")
+                continue
             
             # 출처를 명확히 하기 위해 맨 밑에 저널/블로그 이름을 붙여줍니다.
             final_message = f"{summary_message}\n\n출처: {blog_name}\n{link}"
