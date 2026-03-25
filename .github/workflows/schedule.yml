@@ -44,7 +44,7 @@ jobs:
           git add last_posts.json || echo "No main file to add"
           
           # 아내 기록 파일 반영
-          git add last_posts_wife.json || echo "No wife file to add"
+          git add last_posts_js.json || echo "No wife file to add"
           
           # 변경사항 커밋 및 푸시
           git commit -m "Update daily news records" || echo "No changes to commit"
