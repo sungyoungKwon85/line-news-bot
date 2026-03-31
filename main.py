@@ -71,22 +71,23 @@ def send_line_message(text):
 
 FEEDS = {
     # --- 국내: AI 트렌드 & 대규모 B2C 백엔드 ---
-    "GeekNews (AI/개발 트렌드)": {"url": "https://news.hada.io/rss", "lang": "ko"}, # 💡 주소 수정 완료!
-    "네이버 D2 (AI & 데이터)": {"url": "https://d2.naver.com/d2.atom", "lang": "ko"}, # 국내 AI 기술력 탑티어
+    "GeekNews (AI/개발 트렌드)": {"url": "https://news.hada.io/rss", "lang": "ko"}, 
+    "요즘IT (개발/기획 트렌드)": {"url": "https://yozm.wishket.com/magazine/feed/", "lang": "ko"}, 
+    "네이버 D2 (AI & 데이터)": {"url": "https://d2.naver.com/d2.atom", "lang": "ko"}, 
     "토스 테크": {"url": "https://toss.tech/rss.xml", "lang": "ko"},
     "우아한형제들(배민)": {"url": "https://techblog.woowahan.com/feed/", "lang": "ko"},
     "당근마켓": {"url": "https://medium.com/feed/daangn", "lang": "ko"},
     "라인(LINE) Engineering": {"url": "https://engineering.linecorp.com/ko/feed/", "lang": "ko"},
 
     # --- 해외: 찐 AI 코어 & AI 백엔드 엔지니어링 ---
-    "OpenAI Engineering": {"url": "https://openai.com/blog/rss.xml", "lang": "en"}, # 챗GPT 본진의 기술 블로그
-    "Hugging Face Blog": {"url": "https://huggingface.co/blog/feed.xml", "lang": "en"}, # 오픈소스 AI 모델의 성지
+    "OpenAI Engineering": {"url": "https://openai.com/blog/rss.xml", "lang": "en"}, 
+    "Hugging Face Blog": {"url": "https://huggingface.co/blog/feed.xml", "lang": "en"}, 
     "Google AI Research": {"url": "http://googleresearch.blogspot.com/atom.xml", "lang": "en"},
-    "Meta Engineering": {"url": "https://engineering.fb.com/feed/", "lang": "en"}, # Llama 모델과 대규모 인프라
-    "AWS Machine Learning": {"url": "https://aws.amazon.com/blogs/machine-learning/feed/", "lang": "en"}, # 실무 클라우드 AI 적용기
-    "Netflix TechBlog": {"url": "https://netflixtechblog.com/feed", "lang": "en"}, # 추천 알고리즘 및 글로벌 트래픽 처리
+    "Meta Engineering": {"url": "https://engineering.fb.com/feed/", "lang": "en"}, 
+    "AWS Machine Learning": {"url": "https://aws.amazon.com/blogs/machine-learning/feed/", "lang": "en"}, 
+    "Netflix TechBlog": {"url": "https://netflixtechblog.com/feed", "lang": "en"}, 
     "Uber Engineering": {"url": "https://www.uber.com/en-KR/blog/engineering/rss/", "lang": "en"},
-    "ByteByteGo (System Design)": {"url": "https://blog.bytebytego.com/feed", "lang": "en"} # 대규모 시스템 설계 꿀팁
+    "ByteByteGo (System Design)": {"url": "https://blog.bytebytego.com/feed", "lang": "en"} 
 }
 
 try:
