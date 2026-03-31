@@ -11,17 +11,17 @@
   "Spotify Engineering": "https://engineering.atspotify.com/2026/3/inside-the-archive-2025-wrapped/",
   "Netflix TechBlog": "https://netflixtechblog.com/scaling-global-storytelling-modernizing-localization-analytics-at-netflix-816f47290641?source=rss----2615bd06b42e---4",
   "Airbnb Engineering": "https://medium.com/airbnb-engineering/what-covid-did-to-our-forecasting-models-and-what-we-built-to-handle-the-next-shock-ccbf0e1f7fa9?source=rss----53c7c27702d5---4",
-  "Meta Engineering": "https://engineering.fb.com/2026/03/18/ml-applications/friend-bubbles-enhancing-social-discovery-on-facebook-reels/",
+  "Meta Engineering": "https://engineering.fb.com/2026/03/30/data-center-engineering/ai-for-american-produced-cement-and-concrete/",
   "Cloudflare": "https://blog.cloudflare.com/dynamic-workers/",
   "Pinterest Engineering": "https://medium.com/pinterest-engineering/building-an-mcp-ecosystem-at-pinterest-d881eb4c16f1?source=rss-ef81ef829bcb------2",
   "Slack Engineering": "https://slack.engineering/how-slack-rebuilt-notifications/",
   "Dropbox Tech": "https://dropbox.tech/infrastructure/reducing-our-monorepo-size-to-improve-developer-velocity",
-  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/ep208-load-balancer-vs-api-gateway",
+  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/how-roblox-uses-ai-to-translate-16",
   "네이버 D2 (AI & 데이터)": "https://d2.naver.com/helloworld/7997284",
   "토스 테크": "https://toss.tech/article/place-metric-review",
-  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/advancing-guardrail-models-with-coding-agents",
-  "OpenAI Engineering": "https://openai.com/index/stadler",
+  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/image-content-moderation-at-scale-with-multimodal-llm",
+  "OpenAI Engineering": "https://openai.com/index/helping-disaster-response-teams-asia",
   "Hugging Face Blog": "https://huggingface.co/blog/liberate-your-openclaw",
   "Google AI Research": "http://blog.research.google/feeds/1569605132526995799/comments/default",
-  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/run-generative-ai-inference-with-amazon-bedrock-in-asia-pacific-new-zealand/"
+  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/how-ring-scales-global-customer-support-with-amazon-bedrock-knowledge-bases/"
 }
