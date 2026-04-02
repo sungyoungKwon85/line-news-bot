@@ -16,13 +16,13 @@
   "Pinterest Engineering": "https://medium.com/pinterest-engineering/building-an-mcp-ecosystem-at-pinterest-d881eb4c16f1?source=rss-ef81ef829bcb------2",
   "Slack Engineering": "https://slack.engineering/how-slack-rebuilt-notifications/",
   "Dropbox Tech": "https://dropbox.tech/infrastructure/reducing-our-monorepo-size-to-improve-developer-velocity",
-  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/how-meta-turned-debugging-into-a",
-  "네이버 D2 (AI & 데이터)": "https://d2.naver.com/helloworld/7997284",
+  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/how-datadog-redefined-data-replication",
+  "네이버 D2 (AI & 데이터)": "https://d2.naver.com/news/6428522",
   "토스 테크": "https://toss.tech/article/es-toolkit",
-  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/processing-large-scale-data-with-spark-on-kubernetes",
-  "OpenAI Engineering": "https://openai.com/index/accelerating-the-next-phase-ai",
-  "Hugging Face Blog": "https://huggingface.co/blog/ibm-granite/granite-4-vision",
+  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/how-we-built-a-domain-agnostic-chat-platform",
+  "OpenAI Engineering": "https://openai.com/index/gradient-labs",
+  "Hugging Face Blog": "https://huggingface.co/blog/Hcompany/holo3",
   "Google AI Research": "http://blog.research.google/feeds/1569605132526995799/comments/default",
-  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/build-reliable-ai-agents-with-amazon-bedrock-agentcore-evaluations/",
-  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3686"
+  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/automating-competitive-price-intelligence-with-amazon-nova-act/",
+  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3688"
 }
