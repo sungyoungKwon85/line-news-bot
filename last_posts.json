@@ -17,12 +17,12 @@
   "Slack Engineering": "https://slack.engineering/how-slack-rebuilt-notifications/",
   "Dropbox Tech": "https://dropbox.tech/infrastructure/reducing-our-monorepo-size-to-improve-developer-velocity",
   "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/figma-design-to-code-code-to-design",
-  "네이버 D2 (AI & 데이터)": "https://d2.naver.com/news/2009415",
+  "네이버 D2 (AI & 데이터)": "https://d2.naver.com/news/6236639",
   "토스 테크": "https://toss.tech/article/toss_front",
-  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/resolving-pr-review-bottlenecks-with-ai-and-transforming-review-culture",
-  "OpenAI Engineering": "https://openai.com/index/scaling-trusted-access-for-cyber-defense",
-  "Hugging Face Blog": "https://huggingface.co/blog/waypoint-1-5",
+  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/developing-single-and-multi-agent-systems-with-adk-and-integrating-into-internal-systems",
+  "OpenAI Engineering": "https://openai.com/index/the-next-evolution-of-the-agents-sdk",
+  "Hugging Face Blog": "https://huggingface.co/blog/ibm-research/vakra-benchmark-analysis",
   "Google AI Research": "http://blog.research.google/feeds/1569605132526995799/comments/default",
-  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/navigating-the-generative-ai-journey-the-path-to-value-framework-from-aws/",
-  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3703"
+  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/create-rich-custom-tooltips-in-amazon-quick-sight/",
+  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3710"
 }
