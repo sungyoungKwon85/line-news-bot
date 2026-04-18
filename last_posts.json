@@ -9,7 +9,7 @@
   "야놀자": "https://medium.com/yanolja/%EA%B5%AC%EC%84%B1%EC%9B%90%EC%9D%98-%EA%B0%80%EC%A1%B1%EB%93%A4%EC%97%90%EA%B2%8C-%EC%9D%98%EB%AF%B8-%EC%9E%88%EA%B3%A0-%EB%9C%BB%EA%B9%8A%EC%9D%80-%EC%8B%9C%EA%B0%84%EC%9D%84-%EC%84%A0%EB%AC%BC%ED%95%A0-y-family-program-ii-ff63ec8da5ae?source=rss----783f6bf2cd83---4",
   "쏘카(Socar)": "https://tech.socarcorp.kr/fe/2026/02/24/socar-frame2-web-part2.html",
   "Spotify Engineering": "https://engineering.atspotify.com/2026/3/inside-the-archive-2025-wrapped/",
-  "Netflix TechBlog": "https://netflixtechblog.com/evaluating-netflix-show-synopses-with-llm-as-a-judge-6269251e6f28?source=rss----2615bd06b42e---4",
+  "Netflix TechBlog": "https://netflixtechblog.com/the-human-infrastructure-how-netflix-built-the-operations-layer-behind-live-at-scale-33e2a311c597?source=rss----2615bd06b42e---4",
   "Airbnb Engineering": "https://medium.com/airbnb-engineering/what-covid-did-to-our-forecasting-models-and-what-we-built-to-handle-the-next-shock-ccbf0e1f7fa9?source=rss----53c7c27702d5---4",
   "Meta Engineering": "https://engineering.fb.com/2026/04/16/developer-tools/capacity-efficiency-at-meta-how-unified-ai-agents-optimize-performance-at-hyperscale/",
   "Cloudflare": "https://blog.cloudflare.com/dynamic-workers/",
@@ -21,8 +21,8 @@
   "토스 테크": "https://toss.tech/article/flink-realtime-frequency-capping",
   "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/developing-single-and-multi-agent-systems-with-adk-and-integrating-into-internal-systems",
   "OpenAI Engineering": "https://openai.com/index/codex-for-almost-everything",
-  "Hugging Face Blog": "https://huggingface.co/blog/transformers-to-mlx",
+  "Hugging Face Blog": "https://huggingface.co/blog/nvidia/nemotron-ocr-v2",
   "Google AI Research": "http://blog.research.google/feeds/1569605132526995799/comments/default",
-  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/cost-efficient-custom-text-to-sql-using-amazon-nova-micro-and-amazon-bedrock-on-demand-inference/",
-  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3710"
+  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/introducing-granular-cost-attribution-for-amazon-bedrock/",
+  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3714"
 }
