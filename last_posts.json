@@ -16,13 +16,13 @@
   "Pinterest Engineering": "https://medium.com/pinterest-engineering/building-an-mcp-ecosystem-at-pinterest-d881eb4c16f1?source=rss-ef81ef829bcb------2",
   "Slack Engineering": "https://slack.engineering/how-slack-rebuilt-notifications/",
   "Dropbox Tech": "https://dropbox.tech/infrastructure/reducing-our-monorepo-size-to-improve-developer-velocity",
-  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/ep211-how-the-jvm-works",
+  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/the-security-architecture-of-github",
   "네이버 D2 (AI & 데이터)": "https://d2.naver.com/news/6236639",
   "토스 테크": "https://toss.tech/article/flink-realtime-frequency-capping",
   "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/developing-single-and-multi-agent-systems-with-adk-and-integrating-into-internal-systems",
-  "OpenAI Engineering": "https://openai.com/index/codex-for-almost-everything",
-  "Hugging Face Blog": "https://huggingface.co/blog/nvidia/nemotron-ocr-v2",
+  "OpenAI Engineering": "https://openai.com/index/hyatt-advances-ai-with-chatgpt-enterprise",
+  "Hugging Face Blog": "https://huggingface.co/blog/nvidia/build-korean-agents-with-nemotron-personas",
   "Google AI Research": "http://blog.research.google/feeds/1569605132526995799/comments/default",
-  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/introducing-granular-cost-attribution-for-amazon-bedrock/",
+  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/accelerate-generative-ai-inference-on-amazon-sagemaker-ai-with-g7e-instances/",
   "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3715"
 }
