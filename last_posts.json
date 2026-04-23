@@ -17,12 +17,12 @@
   "Slack Engineering": "https://slack.engineering/how-slack-rebuilt-notifications/",
   "Dropbox Tech": "https://dropbox.tech/infrastructure/reducing-our-monorepo-size-to-improve-developer-velocity",
   "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/how-doordash-launches-a-new-country",
-  "네이버 D2 (AI & 데이터)": "https://d2.naver.com/news/6236639",
+  "네이버 D2 (AI & 데이터)": "https://d2.naver.com/helloworld/6475419",
   "토스 테크": "https://toss.tech/article/flink-realtime-frequency-capping",
-  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/improving-development-efficiency-with-secure-mcp-servers",
-  "OpenAI Engineering": "https://openai.com/index/scaling-codex-to-enterprises-worldwide",
-  "Hugging Face Blog": "https://huggingface.co/blog/tiiuae/qimma-arabic-leaderboard",
+  "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/sli-and-slo-for-improving-reliability-3",
+  "OpenAI Engineering": "https://openai.com/index/making-chatgpt-better-for-clinicians",
+  "Hugging Face Blog": "https://huggingface.co/blog/nvidia/gemma4",
   "Google AI Research": "http://blog.research.google/feeds/1569605132526995799/comments/default",
-  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/from-developer-desks-to-the-whole-organization-running-claude-cowork-in-amazon-bedrock/",
-  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3715"
+  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/cost-effective-multilingual-audio-transcription-at-scale-with-parakeet-tdt-and-aws-batch/",
+  "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3721"
 }
