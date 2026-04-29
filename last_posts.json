@@ -16,13 +16,13 @@
   "Pinterest Engineering": "https://medium.com/pinterest-engineering/building-an-mcp-ecosystem-at-pinterest-d881eb4c16f1?source=rss-ef81ef829bcb------2",
   "Slack Engineering": "https://slack.engineering/how-slack-rebuilt-notifications/",
   "Dropbox Tech": "https://dropbox.tech/infrastructure/reducing-our-monorepo-size-to-improve-developer-velocity",
-  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/how-amazon-uses-llms-to-recommend",
+  "ByteByteGo (System Design)": "https://blog.bytebytego.com/p/how-stripe-detects-fraudulent-transactions",
   "네이버 D2 (AI & 데이터)": "https://d2.naver.com/helloworld/6475419",
   "토스 테크": "https://toss.tech/article/post-quantum-cryptography-eng",
   "라인(LINE) Engineering": "https://techblog.lycorp.co.jp/ko/from-copilot-to-pilot-agentic-coding-implementation-to-pr-automation",
-  "OpenAI Engineering": "https://openai.com/index/openai-available-at-fedramp-moderate",
-  "Hugging Face Blog": "https://huggingface.co/blog/nvidia/raw2insights-adaptive-ultrasound-imaging",
+  "OpenAI Engineering": "https://openai.com/index/our-commitment-to-community-safety",
+  "Hugging Face Blog": "https://huggingface.co/blog/nvidia/nemotron-3-nano-omni-multimodal-intelligence",
   "Google AI Research": "http://blog.research.google/feeds/1569605132526995799/comments/default",
-  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/automate-repetitive-tasks-with-amazon-quick-flows/",
+  "AWS Machine Learning": "https://aws.amazon.com/blogs/machine-learning/migrating-a-text-agent-to-a-voice-assistant-with-amazon-nova-2-sonic/",
   "요즘IT (개발/기획 트렌드)": "https://yozm.wishket.com/magazine/detail/3726"
 }
