@@ -8,6 +8,7 @@ from google import genai
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# 환경 변수
 LINE_TOKEN = os.environ.get('LINE_TOKEN')
 LINE_USER_ID = os.environ.get('LINE_USER_ID')
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
@@ -16,132 +17,100 @@ def summarize_post(title, content, lang, retries=2):
     if not GEMINI_API_KEY:
         return f"[{title}]"
     
-    if len(content) < 50:
-        safe_content = "본문이 RSS에 제공되지 않았습니다. 원문 링크를 참고하세요."
-    else:
-        safe_content = content
-
     client = genai.Client(api_key=GEMINI_API_KEY)
+    
+    # 백엔드 개발자 맞춤형 프롬프트로 강화
     prompt = f"""
-    다음 IT 기술 블로그 글을 읽고 메시지를 작성해.
+    당신은 15년차 시니어 백엔드 아키텍트이자 AI 엔지니어입니다. 
+    다음 기술 콘텐츠를 분석하여 '실무 적용 가능성' 중심으로 요약하세요.
     
-    요구사항:
-    1. 제목이 영어라면 한국어로 번역해서 첫 줄에 대괄호 `[]` 안에 적어. (한국어면 원문 그대로)
-    2. 본문 내용을 파악하여 백엔드/아키텍처 관점에서 핵심만 2~3줄로 한글로 요약해. (각 줄은 `-` 로 시작)
-    3. 인사말이나 수식어 없이 딱 제목과 요약만 출력해.
-    
+    [분석 가이드라인]
+    1. 제목: 한국어로 번역 (대괄호 포함)
+    2. 핵심 요약 (3줄 이내): 
+       - 이 기술/도구가 '어떤 백엔드 문제를 해결'하는가?
+       - Graphify처럼 '비용(토큰) 절감'이나 '성능(Virtual Threads 등)'에 이득이 있는가?
+       - 구체적인 '하네스(Harness)'나 '패턴'이 언급되었는가?
+    3. 실무 키워드: 관련 기술 스택(예: Java, MCP, RAG, Prompt Caching 등)을 별도로 표시.
+
     [원본 데이터]
     제목: {title}
     언어: {lang}
-    본문: {safe_content}
+    본문: {content[:3000]} 
     """
     
-    # 에러 시 재시도(Retry) 로직
     for attempt in range(retries):
         try:
+            # 모델명은 현재 사용 가능한 최신 버전으로 유지
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-3-flash', 
                 contents=prompt
             )
             return response.text.strip()
         except Exception as e:
-            print(f"요약 에러 ({title}) - 시도 {attempt+1}/{retries}: {e}")
-            if attempt < retries - 1:
-                print("15초 대기 후 재시도합니다...")
-                time.sleep(15) # 제한에 걸렸을 경우 15초간 충분히 휴식
-            else:
-                return None
+            time.sleep(10)
+            if attempt == retries - 1: return None
 
 def send_line_message(text):
     url = "https://api.line.me/v2/bot/message/push"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {LINE_TOKEN}"
-    }
-    payload = {
-        "to": LINE_USER_ID,
-        "messages": [{"type": "text", "text": text}]
-    }
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_TOKEN}"}
+    payload = {"to": LINE_USER_ID, "messages": [{"type": "text", "text": text}]}
     res = requests.post(url, headers=headers, json=payload)
-    
-    if res.status_code != 200:
-        print(f"🚨 라인 전송 실패! 코드: {res.status_code}")
-        return False
-    return True
+    return res.status_code == 200
 
+# --- 백엔드 + AI 하네스 특화 피드 ---
 FEEDS = {
-    # --- 국내: AI 트렌드 & 대규모 B2C 백엔드 ---
-    "GeekNews (AI/개발 트렌드)": {"url": "https://news.hada.io/rss", "lang": "ko"}, 
-    "요즘IT (개발/기획 트렌드)": {"url": "https://yozm.wishket.com/magazine/feed/", "lang": "ko"}, 
-    "네이버 D2 (AI & 데이터)": {"url": "https://d2.naver.com/d2.atom", "lang": "ko"}, 
-    "토스 테크": {"url": "https://toss.tech/rss.xml", "lang": "ko"},
-    "우아한형제들(배민)": {"url": "https://techblog.woowahan.com/feed/", "lang": "ko"},
-    "당근마켓": {"url": "https://medium.com/feed/daangn", "lang": "ko"},
-    "라인(LINE) Engineering": {"url": "https://engineering.linecorp.com/ko/feed/", "lang": "ko"},
+    # 1. AI 아키텍처 & 하네스 (가장 중요)
+    "Anthropic News (MCP/Context)": {"url": "https://www.anthropic.com/news/rss", "lang": "en"},
+    "LangChain Blog (Agentic Patterns)": {"url": "https://blog.langchain.dev/rss/", "lang": "en"},
+    "LlamaIndex (RAG & Data Harness)": {"url": "https://www.llamaindex.ai/blog/rss.xml", "lang": "en"},
+    
+    # 2. 백엔드 실무 & 성능 (Spring/Java/Infrastructure)
+    "Spring Blog (Spring AI/Virtual Threads)": {"url": "https://spring.io/blog.atom", "lang": "en"},
+    "Cloudflare Blog (AI at Edge/Inference)": {"url": "https://blog.cloudflare.com/rss/", "lang": "en"},
+    "Netflix TechBlog (Scale & AI)": {"url": "https://netflixtechblog.com/feed", "lang": "en"},
+    
+    # 3. AI 관측성 & 토큰 최적화
+    "Langfuse Blog (LLM Observability)": {"url": "https://langfuse.com/rss.xml", "lang": "en"},
+    "Helicone (Token/Cost Optimization)": {"url": "https://www.helicone.ai/blog/rss.xml", "lang": "en"},
 
-    # --- 해외: 찐 AI 코어 & AI 백엔드 엔지니어링 ---
-    "OpenAI Engineering": {"url": "https://openai.com/blog/rss.xml", "lang": "en"}, 
-    "Hugging Face Blog": {"url": "https://huggingface.co/blog/feed.xml", "lang": "en"}, 
-    "Google AI Research": {"url": "http://googleresearch.blogspot.com/atom.xml", "lang": "en"},
-    "Meta Engineering": {"url": "https://engineering.fb.com/feed/", "lang": "en"}, 
-    "AWS Machine Learning": {"url": "https://aws.amazon.com/blogs/machine-learning/feed/", "lang": "en"}, 
-    "Netflix TechBlog": {"url": "https://netflixtechblog.com/feed", "lang": "en"}, 
-    "Uber Engineering": {"url": "https://www.uber.com/en-KR/blog/engineering/rss/", "lang": "en"},
-    "ByteByteGo (System Design)": {"url": "https://blog.bytebytego.com/feed", "lang": "en"} 
+    # 4. 국내 정제된 정보 (큐레이션)
+    "GeekNews (핵심 요약)": {"url": "https://news.hada.io/rss", "lang": "ko"}
 }
 
+# (기존 파싱 및 실행 로직 동일...)
 try:
     with open('last_posts.json', 'r', encoding='utf-8') as f:
         last_posts = json.load(f)
-except (FileNotFoundError, json.JSONDecodeError):
+except:
     last_posts = {}
 
 new_posts_found = False
 
 for blog_name, info in FEEDS.items():
-    rss_url = info["url"]
-    lang = info["lang"]
     try:
-        response = requests.get(rss_url, timeout=10, verify=False)
+        response = requests.get(info["url"], timeout=15, verify=False)
         soup = BeautifulSoup(response.content, 'xml')
-        
         latest_item = soup.find('item') or soup.find('entry')
+        
         if not latest_item: continue
         
         title = latest_item.title.text.strip()
+        link = (latest_item.link.text.strip() if latest_item.link.text else latest_item.link.get('href'))
         
-        link_tag = latest_item.link
-        if link_tag:
-            link = link_tag.text.strip() if link_tag.text.strip() else link_tag.get('href', '')
-        else: continue
+        if link != last_posts.get(blog_name):
+            # 내용 추출
+            content_tag = latest_item.find(['content:encoded', 'description', 'summary', 'content'])
+            text_content = BeautifulSoup(content_tag.text, "html.parser").get_text()[:2500]
             
-        content_tag = latest_item.find('content:encoded') or latest_item.find('encoded') or latest_item.find('description') or latest_item.find('summary') or latest_item.find('content')
-        raw_content = content_tag.text if content_tag else ""
-        
-        text_content = BeautifulSoup(raw_content, "html.parser").get_text(separator=" ", strip=True)[:2000]
-
-        last_link = last_posts.get(blog_name, "")
-        
-        if link and link != last_link:
-            # ⭐ 기본 대기 시간을 6초로 늘려 안정성 확보
-            time.sleep(6)
-            
-            summary_message = summarize_post(title, text_content, lang)
-            if summary_message is None:
-                print(f"⚠️ [{blog_name}] 요약 실패! 라인 전송을 보류하고 내일 다시 시도합니다.")
-                continue
-            final_message = f"{summary_message}\n\n{link}"
-            
-            if send_line_message(final_message):
-                last_posts[blog_name] = link
-                new_posts_found = True
-                
+            summary = summarize_post(title, text_content, info["lang"])
+            if summary:
+                if send_line_message(f"🚀 [AI Backend Skill]\n\n{summary}\n\n🔗 {link}"):
+                    last_posts[blog_name] = link
+                    new_posts_found = True
+            time.sleep(5)
     except Exception as e:
-        print(f"{blog_name} 파싱 에러: {e}")
+        print(f"Error {blog_name}: {e}")
 
 if new_posts_found:
     with open('last_posts.json', 'w', encoding='utf-8') as f:
         json.dump(last_posts, f, ensure_ascii=False, indent=2)
-    print("새 글 전송 및 기록 업데이트 완료!")
-else:
-    print("새로운 글이 없습니다.")
