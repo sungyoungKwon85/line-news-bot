@@ -59,10 +59,16 @@ def send_line_message(text):
 
 # --- 백엔드 + AI 하네스 특화 피드 ---
 FEEDS = {
+    # --- 해외: 찐 AI 코어 & AI 백엔드 엔지니어링 ---
+    "Hugging Face Blog": {"url": "https://huggingface.co/blog/feed.xml", "lang": "en"}, 
+    "Google AI Research": {"url": "http://googleresearch.blogspot.com/atom.xml", "lang": "en"},
+    "Netflix TechBlog": {"url": "https://netflixtechblog.com/feed", "lang": "en"}, 
+    
     # 1. AI 아키텍처 & 하네스 (가장 중요)
     "Anthropic News (MCP/Context)": {"url": "https://www.anthropic.com/news/rss", "lang": "en"},
     "LangChain Blog (Agentic Patterns)": {"url": "https://blog.langchain.dev/rss/", "lang": "en"},
     "LlamaIndex (RAG & Data Harness)": {"url": "https://www.llamaindex.ai/blog/rss.xml", "lang": "en"},
+    "OpenAI Engineering": {"url": "https://openai.com/blog/rss.xml", "lang": "en"}, 
     
     # 2. 백엔드 실무 & 성능 (Spring/Java/Infrastructure)
     "Spring Blog (Spring AI/Virtual Threads)": {"url": "https://spring.io/blog.atom", "lang": "en"},
@@ -74,7 +80,8 @@ FEEDS = {
     "Helicone (Token/Cost Optimization)": {"url": "https://www.helicone.ai/blog/rss.xml", "lang": "en"},
 
     # 4. 국내 정제된 정보 (큐레이션)
-    "GeekNews (핵심 요약)": {"url": "https://news.hada.io/rss", "lang": "ko"}
+    "GeekNews (핵심 요약)": {"url": "https://news.hada.io/rss", "lang": "ko"},
+    "요즘IT (개발/기획 트렌드)": {"url": "https://yozm.wishket.com/magazine/feed/", "lang": "ko"}
 }
 
 # (기존 파싱 및 실행 로직 동일...)
