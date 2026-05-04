@@ -56,7 +56,11 @@ FEEDS = {
     "Cloudflare (AI/Edge)": {"url": "https://blog.cloudflare.com/rss/", "lang": "en"},
     "Langfuse (LLM Obs)": {"url": "https://langfuse.com/rss.xml", "lang": "en"},
     "Helicone (Cost)": {"url": "https://www.helicone.ai/blog/rss.xml", "lang": "en"},
-    "GeekNews": {"url": "https://news.hada.io/rss", "lang": "ko"}
+    "Hugging Face Blog": {"url": "https://huggingface.co/blog/feed.xml", "lang": "en"}, 
+    "Google AI Research": {"url": "http://googleresearch.blogspot.com/atom.xml", "lang": "en"},
+    "OpenAI Engineering": {"url": "https://openai.com/blog/rss.xml", "lang": "en"}, 
+    "GeekNews": {"url": "https://news.hada.io/rss", "lang": "ko"},
+    "요즘IT (개발/기획 트렌드)": {"url": "https://yozm.wishket.com/magazine/feed/", "lang": "ko"}
 }
 
 # 상태 관리 로드
