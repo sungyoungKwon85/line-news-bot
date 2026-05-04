@@ -8,121 +8,141 @@ from google import genai
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# 환경 변수 확인
 LINE_TOKEN = os.environ.get('LINE_TOKEN')
 LINE_USER_ID = os.environ.get('LINE_USER_ID')
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 def summarize_post(title, content, lang, retries=2):
     if not GEMINI_API_KEY:
-        print("⚠️ GEMINI_API_KEY 가 설정되지 않았습니다.")
         return f"[{title}]"
     
+    if len(content) < 50:
+        safe_content = "본문이 RSS에 제공되지 않았습니다. 원문 링크를 참고하세요."
+    else:
+        safe_content = content
+
     client = genai.Client(api_key=GEMINI_API_KEY)
-    
     prompt = f"""
-    당신은 15년차 시니어 백엔드 아키텍트입니다. 
-    다음 기술 콘텐츠를 '실무 적용' 관점에서 요약하세요.
-    1. 제목: 한글 번역 (대괄호 포함)
-    2. 핵심 요약: 백엔드/AI 하네스 관점에서 3줄 이내 요약 (- 사용)
-    3. 실무 키워드: 관련 스택 표시
-    제목: {title} / 언어: {lang} / 본문: {content[:3000]}
+    다음 IT 기술 블로그 글을 읽고 메시지를 작성해.
+    
+    요구사항:
+    1. 제목이 영어라면 한국어로 번역해서 첫 줄에 대괄호 `[]` 안에 적어. (한국어면 원문 그대로)
+    2. 본문 내용을 파악하여 백엔드/아키텍처 관점에서 핵심만 2~3줄로 한글로 요약해. (각 줄은 `-` 로 시작)
+    3. 인사말이나 수식어 없이 딱 제목과 요약만 출력해.
+    
+    [원본 데이터]
+    제목: {title}
+    언어: {lang}
+    본문: {safe_content}
     """
     
+    # 에러 시 재시도(Retry) 로직
     for attempt in range(retries):
         try:
-            # 모델명을 명확히 지정 (Gemini 3 Flash 사용)
             response = client.models.generate_content(
-                model='gemini-3-flash', 
+                model='gemini-2.5-flash',
                 contents=prompt
             )
             return response.text.strip()
         except Exception as e:
-            print(f"   - Gemini API 에러 (시도 {attempt+1}): {e}")
-            time.sleep(5)
-    return None
+            print(f"요약 에러 ({title}) - 시도 {attempt+1}/{retries}: {e}")
+            if attempt < retries - 1:
+                print("15초 대기 후 재시도합니다...")
+                time.sleep(15) # 제한에 걸렸을 경우 15초간 충분히 휴식
+            else:
+                return None
 
 def send_line_message(text):
     url = "https://api.line.me/v2/bot/message/push"
-    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {LINE_TOKEN}"}
-    payload = {"to": LINE_USER_ID, "messages": [{"type": "text", "text": text}]}
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {LINE_TOKEN}"
+    }
+    payload = {
+        "to": LINE_USER_ID,
+        "messages": [{"type": "text", "text": text}]
+    }
     res = requests.post(url, headers=headers, json=payload)
-    return res.status_code == 200
+    
+    if res.status_code != 200:
+        print(f"🚨 라인 전송 실패! 코드: {res.status_code}")
+        return False
+    return True
 
 FEEDS = {
+    # --- 국내: AI 트렌드 & 대규모 B2C 백엔드 ---
+    "GeekNews (AI/개발 트렌드)": {"url": "https://news.hada.io/rss", "lang": "ko"}, 
+    "요즘IT (개발/기획 트렌드)": {"url": "https://yozm.wishket.com/magazine/feed/", "lang": "ko"}, 
+    "토스 테크": {"url": "https://toss.tech/rss.xml", "lang": "ko"},
+
+
+    # --- 해외: 찐 AI 코어 & AI 백엔드 엔지니어링 ---
     "Anthropic News (MCP)": {"url": "https://www.anthropic.com/news/rss", "lang": "en"},
+    "OpenAI Engineering": {"url": "https://openai.com/blog/rss.xml", "lang": "en"}, 
+    "Hugging Face Blog": {"url": "https://huggingface.co/blog/feed.xml", "lang": "en"}, 
+    "Google AI Research": {"url": "http://googleresearch.blogspot.com/atom.xml", "lang": "en"},
+    "Meta Engineering": {"url": "https://engineering.fb.com/feed/", "lang": "en"}, 
+    "Netflix TechBlog": {"url": "https://netflixtechblog.com/feed", "lang": "en"}, 
     "LangChain Blog": {"url": "https://blog.langchain.dev/rss/", "lang": "en"},
     "Spring Blog": {"url": "https://spring.io/blog.atom", "lang": "en"},
     "Cloudflare (AI/Edge)": {"url": "https://blog.cloudflare.com/rss/", "lang": "en"},
     "Langfuse (LLM Obs)": {"url": "https://langfuse.com/rss.xml", "lang": "en"},
-    "Helicone (Cost)": {"url": "https://www.helicone.ai/blog/rss.xml", "lang": "en"},
-    "Hugging Face Blog": {"url": "https://huggingface.co/blog/feed.xml", "lang": "en"}, 
-    "Google AI Research": {"url": "http://googleresearch.blogspot.com/atom.xml", "lang": "en"},
-    "OpenAI Engineering": {"url": "https://openai.com/blog/rss.xml", "lang": "en"}, 
-    "GeekNews": {"url": "https://news.hada.io/rss", "lang": "ko"},
-    "요즘IT (개발/기획 트렌드)": {"url": "https://yozm.wishket.com/magazine/feed/", "lang": "ko"}
+    "Helicone (Cost)": {"url": "https://www.helicone.ai/blog/rss.xml", "lang": "en"}
+    
 }
 
-# 상태 관리 로드
 try:
     with open('last_posts.json', 'r', encoding='utf-8') as f:
         last_posts = json.load(f)
-except:
+except (FileNotFoundError, json.JSONDecodeError):
     last_posts = {}
-    print("ℹ️ 기존 기록이 없어 새로 생성합니다.")
 
 new_posts_found = False
 
 for blog_name, info in FEEDS.items():
-    print(f"🔍 확인 중: {blog_name}...")
+    rss_url = info["url"]
+    lang = info["lang"]
     try:
-        response = requests.get(info["url"], timeout=20, verify=False)
+        response = requests.get(rss_url, timeout=10, verify=False)
         soup = BeautifulSoup(response.content, 'xml')
         
-        # RSS(item) vs Atom(entry) 모두 대응
-        entry = soup.find('item') or soup.find('entry')
-        if not entry:
-            print(f"   - 게시글을 찾을 수 없습니다.")
-            continue
+        latest_item = soup.find('item') or soup.find('entry')
+        if not latest_item: continue
         
-        title = entry.title.text.strip()
+        title = latest_item.title.text.strip()
         
-        # 링크 추출 방식 강화 (href 속성 우선 확인)
-        link_tag = entry.find('link')
+        link_tag = latest_item.link
         if link_tag:
-            link = link_tag.get('href') or link_tag.text.strip()
-        else:
-            print(f"   - 링크 태그가 없습니다.")
-            continue
-
-        # 중복 체크
-        if link == last_posts.get(blog_name):
-            print(f"   - 새로운 글 없음 (최근 글: {title[:20]}...)")
-            continue
-
-        print(f"   - ✨ 새 글 발견! 요약 중: {title}")
+            link = link_tag.text.strip() if link_tag.text.strip() else link_tag.get('href', '')
+        else: continue
+            
+        content_tag = latest_item.find('content:encoded') or latest_item.find('encoded') or latest_item.find('description') or latest_item.find('summary') or latest_item.find('content')
+        raw_content = content_tag.text if content_tag else ""
         
-        # 본문 추출 로직 강화
-        content_tag = entry.find(['content:encoded', 'content', 'description', 'summary'])
-        text_content = BeautifulSoup(content_tag.text, "html.parser").get_text() if content_tag else "본문 없음"
+        text_content = BeautifulSoup(raw_content, "html.parser").get_text(separator=" ", strip=True)[:2000]
+
+        last_link = last_posts.get(blog_name, "")
         
-        summary = summarize_post(title, text_content, info["lang"])
-        if summary:
-            if send_line_message(f"🚀 [AI Backend Skill]\n\n{summary}\n\n🔗 {link}"):
+        if link and link != last_link:
+            # ⭐ 기본 대기 시간을 6초로 늘려 안정성 확보
+            time.sleep(6)
+            
+            summary_message = summarize_post(title, text_content, lang)
+            if summary_message is None:
+                print(f"⚠️ [{blog_name}] 요약 실패! 라인 전송을 보류하고 내일 다시 시도합니다.")
+                continue
+            final_message = f"{summary_message}\n\n{link}"
+            
+            if send_line_message(final_message):
                 last_posts[blog_name] = link
                 new_posts_found = True
-                print(f"   - ✅ 라인 전송 완료")
-            else:
-                print(f"   - 🚨 라인 전송 실패")
-        
-        time.sleep(2) # API Rate limit 방지
-        
+                
     except Exception as e:
-        print(f"   - ❌ 에러 발생: {e}")
+        print(f"{blog_name} 파싱 에러: {e}")
 
 if new_posts_found:
     with open('last_posts.json', 'w', encoding='utf-8') as f:
         json.dump(last_posts, f, ensure_ascii=False, indent=2)
-    print("\n🎉 모든 작업 완료!")
+    print("새 글 전송 및 기록 업데이트 완료!")
 else:
-    print("\n😴 업데이트된 내용이 없습니다.")
+    print("새로운 글이 없습니다.")
