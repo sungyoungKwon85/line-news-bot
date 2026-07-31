@@ -251,6 +251,12 @@ def get_field(value, name, default=None):
     return getattr(value, name, default)
 
 
+def utf8_byte_offset_to_char_index(text, byte_offset):
+    encoded = text.encode("utf-8")
+    bounded = max(0, min(int(byte_offset), len(encoded)))
+    return len(encoded[:bounded].decode("utf-8", errors="ignore"))
+
+
 def extract_grounded_text(interaction):
     pieces = []
     citations = []
@@ -280,8 +286,10 @@ def extract_grounded_text(interaction):
                 {
                     "url": url,
                     "title": clean_text(get_field(annotation, "title", "")),
-                    "start": block_start + int(start),
-                    "end": block_start + int(end),
+                    "start": block_start
+                    + utf8_byte_offset_to_char_index(text, start),
+                    "end": block_start
+                    + utf8_byte_offset_to_char_index(text, end),
                 }
             )
 
@@ -630,6 +638,10 @@ def build_briefing(
         news = validate_and_select_news(raw_news, now, history)
         events = validate_events(raw_events, now)
         summary = validate_summary(raw_summary, news)
+        print(
+            f"뉴스 후보 {len(raw_news)}건 / 검증 통과 {len(news)}건, "
+            f"일정 후보 {len(raw_events)}건 / 검증 통과 {len(events)}건"
+        )
     except Exception as exc:
         news_error = str(exc)
         print(f"뉴스 조회 실패: {exc}")
