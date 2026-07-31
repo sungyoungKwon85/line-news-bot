@@ -216,14 +216,14 @@ def build_news_prompt(now, previous_titles):
 - 중앙은행, 통계기관, 정부, 국제기구 등 1차 출처를 우선한다.
 - 보도는 Reuters, AP, BBC, Bloomberg, FT, 연합뉴스 등 주요 언론만 사용한다.
 - 블로그, SNS, 사설, 전망성 기사, 연예, 스포츠, 단순 사건, 개별 종목 등락은 제외한다.
-- 공식 1차 출처 1개 또는 서로 독립적인 주요 언론 2개로 확인한다.
+- 공식 1차 출처 또는 신뢰할 수 있는 주요 언론 1개 이상으로 확인한다.
 - 각 SUMMARY, ITEM, EVENT 줄의 사실에 검색 citation이 직접 연결되게 작성한다.
 
 중요도 점수:
 - reach: 영향 범위 0~3
 - persistence: 영향 지속성 0~2
 - korea: 한국의 환율/금리/물가/고용/무역 영향 0~3
-- corroboration: 공식 출처 또는 독립 출처 확인 수준 0~2
+- corroboration: 공식 출처나 독립 언론 2곳이면 2, 주요 언론 1곳이면 1
 - 합계 7점 미만은 출력하지 않는다.
 
 반복 방지:
@@ -485,12 +485,15 @@ def validate_and_select_news(raw_news, now, history):
             for source in sources
             if source["kind"] == "media"
         }
-        if not has_primary and len(media_publishers) < 2:
+        if not has_primary and not media_publishers:
             continue
 
+        source_corroboration = (
+            2 if has_primary or len(media_publishers) >= 2 else 1
+        )
         corroboration = min(
             item["reported_corroboration"],
-            2,
+            source_corroboration,
         )
         importance = (
             item["reach"]
