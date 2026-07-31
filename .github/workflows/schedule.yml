@@ -32,6 +32,7 @@ jobs:
         env: 
           LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python dividend_bot.py
 
       - name: "[남편] 백엔드 IT 뉴스 봇 실행!"
