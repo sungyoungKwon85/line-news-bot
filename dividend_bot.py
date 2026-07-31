@@ -12,7 +12,6 @@ from zoneinfo import ZoneInfo
 KST = ZoneInfo("Asia/Seoul")
 LINE_PUSH_URL = "https://api.line.me/v2/bot/message/push"
 DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
-IMPORTANCE_THRESHOLD = 7
 HISTORY_DAYS = 7
 
 FX_TICKERS = (
@@ -207,7 +206,7 @@ def build_news_prompt(now, previous_titles):
 반드시 Google Search를 사용해 {cutoff.isoformat()} 이후 공개되거나 중대한
 진전이 생긴 뉴스를 확인하라.
 
-아래 세 분야에서 기준을 넘는 뉴스만 분야별 최대 1건 고른다.
+아래 세 분야에서 가장 중요한 뉴스를 분야별 1건씩 총 3건 반드시 고른다.
 1. WORLD_ECONOMY: 중앙은행, 물가, 고용, 무역, 에너지 등 세계 경제
 2. GLOBAL_CORE: 국제정세, 정책, 기술/AI, 과학, 에너지/기후 중 파급력이 가장 큰 이슈
 3. KOREA_IMPACT: 한국 경제생활에 직접 영향이 큰 국내외 뉴스
@@ -224,7 +223,7 @@ def build_news_prompt(now, previous_titles):
 - persistence: 영향 지속성 0~2
 - korea: 한국의 환율/금리/물가/고용/무역 영향 0~3
 - corroboration: 공식 출처나 독립 언론 2곳이면 2, 주요 언론 1곳이면 1
-- 합계 7점 미만은 출력하지 않는다.
+- 점수는 분야별 우선순위를 정하는 용도로만 사용한다.
 
 반복 방지:
 아래 최근 제목과 같은 사건은 제외하되, 새로운 정책 결정이나 수치 발표처럼
@@ -241,7 +240,7 @@ SUMMARY|전체 흐름을 요약한 한 문장
 ITEM|분야 코드|사건 발생 또는 중대한 진전 시각 ISO 8601|reach|persistence|korea|corroboration|제목|왜 중요한지와 한국 경제생활 영향을 합친 한 문장
 EVENT|KST 기준 YYYY-MM-DD|HH:MM 또는 미정|일정 이름
 
-기준을 넘는 ITEM이나 EVENT가 없으면 해당 줄은 생략한다.
+ITEM은 반드시 3줄 출력하고, 오늘 EVENT가 없으면 EVENT만 생략한다.
 """.strip()
 
 
@@ -320,7 +319,15 @@ def citations_for_span(citations, start, end):
             continue
         seen.add(citation["url"])
         selected.append(citation)
-    return selected
+    if selected or not citations:
+        return selected
+
+    def distance(citation):
+        if citation["end"] <= start:
+            return start - citation["end"]
+        return citation["start"] - end
+
+    return [min(citations, key=distance)]
 
 
 def parse_iso_datetime(value):
@@ -415,26 +422,15 @@ def source_kind(url):
         if matches_domain(host, domain):
             publisher = "bbc" if domain in {"bbc.com", "bbc.co.uk"} else domain
             return "media", host, publisher
-    return None, host, None
+
+    known_domains = PRIMARY_SOURCE_DOMAINS | TRUSTED_MEDIA_DOMAINS
+    if any(domain in host for domain in known_domains):
+        return None, host, None
+    return "grounded", host, host
 
 
 def normalize_title(title):
     return re.sub(r"[^0-9a-z가-힣]+", "", clean_text(title).lower())
-
-
-def titles_are_similar(left, right):
-    left = normalize_title(left)
-    right = normalize_title(right)
-    return bool(left and right and left == right)
-
-
-def is_history_repeat(item, history):
-    for previous in history:
-        if item["source_url"] == previous.get("url"):
-            return True
-        if titles_are_similar(item["title"], previous.get("title", "")):
-            return True
-    return False
 
 
 def verified_sources(citations):
@@ -485,7 +481,7 @@ def validate_and_select_news(raw_news, now, history):
             for source in sources
             if source["kind"] == "media"
         }
-        if not has_primary and not media_publishers:
+        if not sources:
             continue
 
         source_corroboration = (
@@ -501,11 +497,6 @@ def validate_and_select_news(raw_news, now, history):
             + item["korea"]
             + corroboration
         )
-        if importance < IMPORTANCE_THRESHOLD:
-            continue
-        if item["category"] == "KOREA_IMPACT" and item["korea"] < 2:
-            continue
-
         candidate = {
             **item,
             "title": truncate(item["title"], 58),
@@ -515,12 +506,9 @@ def validate_and_select_news(raw_news, now, history):
             "source_host": sources[0]["host"].removeprefix("www."),
             "sources": sources,
         }
-        if is_history_repeat(candidate, history):
-            continue
         candidates.append(candidate)
 
     selected = []
-    used_urls = set()
     for category in CATEGORY_ORDER:
         category_items = [
             item for item in candidates if item["category"] == category
@@ -529,17 +517,8 @@ def validate_and_select_news(raw_news, now, history):
             key=lambda item: (item["importance"], item["occurred_at"]),
             reverse=True,
         )
-        for item in category_items:
-            if item["source_url"] in used_urls:
-                continue
-            if any(
-                titles_are_similar(item["title"], chosen["title"])
-                for chosen in selected
-            ):
-                continue
-            selected.append(item)
-            used_urls.add(item["source_url"])
-            break
+        if category_items:
+            selected.append(category_items[0])
     return selected
 
 
@@ -555,20 +534,33 @@ def validate_events(raw_events, now):
         ):
             continue
         sources = verified_sources(event["citations"])
-        official = next(
+        selected_source = next(
             (source for source in sources if source["kind"] == "primary"),
             None,
         )
+        if selected_source is None:
+            selected_source = next(
+                (
+                    source
+                    for source in sources
+                    if source["kind"] == "grounded"
+                ),
+                None,
+            )
         title_key = normalize_title(event["title"])
-        if not official or not title_key or title_key in seen_titles:
+        if (
+            not selected_source
+            or not title_key
+            or title_key in seen_titles
+        ):
             continue
         seen_titles.add(title_key)
         selected.append(
             {
                 "time": event["time"],
                 "title": truncate(event["title"], 55),
-                "source_url": official["url"],
-                "source_host": official["host"].removeprefix("www."),
+                "source_url": selected_source["url"],
+                "source_host": selected_source["host"].removeprefix("www."),
             }
         )
         if len(selected) == 2:
