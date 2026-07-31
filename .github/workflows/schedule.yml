@@ -28,7 +28,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python js.py
 
-      - name: "[남편] 배당주 모니터링 봇 실행!"
+      - name: "[남편] 아침 브리핑 실행!"
         env: 
           LINE_TOKEN: ${{ secrets.LINE_TOKEN }}
           LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
